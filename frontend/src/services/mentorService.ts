@@ -17,6 +17,7 @@ export async function createMentorIfNotExists(user: User) {
       email: user.email,
       photoURL: user.photoURL,
       createdAt: serverTimestamp(),
+      tutors: [],
     });
     console.log("mentor created:", user.displayName);
   } else {
