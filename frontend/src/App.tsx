@@ -1,3 +1,5 @@
+// src/App.tsx
+
 import "./App.css";
 import Login from "./components/Login";
 import { signInWithGoogle } from "./services/auth";

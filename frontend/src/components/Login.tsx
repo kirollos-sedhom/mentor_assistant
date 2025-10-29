@@ -1,5 +1,8 @@
+// src/components/Login.tsx
+
 import React, { useState } from "react";
 import { signInWithGoogle } from "../services/auth";
+import { createMentorIfNotExists } from "../services/mentorService";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -13,6 +16,7 @@ export default function Login() {
       const user = await signInWithGoogle();
       console.log("wellcome: ", user.displayName);
       console.log("your id is: ", user.uid);
+      createMentorIfNotExists(user);
     } catch (error) {
       if (error instanceof Error) setError(error.message);
     } finally {
