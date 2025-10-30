@@ -1,19 +1,43 @@
 // src/App.tsx
 
+import { onAuthStateChanged, type User } from "firebase/auth";
 import "./App.css";
 import Login from "./components/Login";
-import { signInWithGoogle } from "./services/auth";
+import { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import { Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Dashboard from "./components/Dashboard";
 
 function App() {
-  function handleLogin() {
-    signInWithGoogle();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <h1>loading...</h1>;
   }
   return (
-    <>
-      <div className="bg-red-300">mentor assistant who are you?</div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute user={user}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
 
-      <Login />
-    </>
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 }
 

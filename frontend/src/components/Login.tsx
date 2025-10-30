@@ -1,6 +1,6 @@
 // src/components/Login.tsx
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { signInWithGoogle } from "../services/auth";
 import { createMentorIfNotExists } from "../services/mentorService";
 
