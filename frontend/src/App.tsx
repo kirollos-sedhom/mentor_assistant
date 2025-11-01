@@ -8,19 +8,10 @@ import { auth } from "./firebase";
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const { user, loading } = useAuth();
 
   if (loading) {
     return <h1>loading...</h1>;
