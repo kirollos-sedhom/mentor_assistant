@@ -9,6 +9,7 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import { useAuth } from "./context/AuthContext";
+import TutorPage from "./pages/TutorPage";
 
 function App() {
   const { user, loading } = useAuth();
@@ -23,6 +24,14 @@ function App() {
         element={
           <ProtectedRoute user={user}>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/tutors/:tutorId"
+        element={
+          <ProtectedRoute user={user}>
+            <TutorPage />
           </ProtectedRoute>
         }
       />

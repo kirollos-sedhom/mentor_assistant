@@ -1,12 +1,13 @@
-// src/components/AddTutorModal.tsx
+// src/components/UpdateTutorModal.tsx
 
-import AddTutorForm from "./AddTutorForm";
+import UpdateTutorForm from "./UpdateTutorForm";
 
 type Props = {
   onClose: () => void;
+  tutorId: string;
 };
 
-export default function AddTutorModal({ onClose }: Props) {
+export default function UpdateTutorModal({ onClose, tutorId }: Props) {
   return (
     <>
       <div
@@ -19,7 +20,7 @@ export default function AddTutorModal({ onClose }: Props) {
         >
           {/* modal header */}
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Add new Tutor</h2>
+            <h2 className="text-xl font-bold">Update Tutor</h2>
             <button
               onClick={() => onClose()}
               className="text-gray-600 hover:text-gray-900 text-2xl"
@@ -27,7 +28,7 @@ export default function AddTutorModal({ onClose }: Props) {
               &times;
             </button>
           </div>
-          <AddTutorForm onSuccess={onClose} />
+          <UpdateTutorForm tutorId={tutorId} onSuccess={onClose} />
         </div>
       </div>
     </>

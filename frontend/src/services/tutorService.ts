@@ -1,10 +1,14 @@
 // src/services/tutorService.ts
 
 import {
+  addDoc,
+  collection,
+  deleteDoc,
   doc,
   getDoc,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -34,5 +38,31 @@ export async function updateTutor(
   updatedFields: Partial<{ tutorName: string }>
 ) {
   const tutorRef = doc(db, "mentors", mentorId, "tutors", tutorId);
-  await updateDoc(tutorRef, updatedFields);
+  await updateDoc(tutorRef, { ...updatedFields, updatedAt: serverTimestamp() });
+}
+
+export async function deleteTutor(mentorId: string, tutorId: string) {
+  const tutorRef = doc(db, "mentors", mentorId, "tutors", tutorId);
+  await deleteDoc(tutorRef);
+}
+
+export async function addIncident(
+  mentorId: string,
+  tutorId: string,
+  incidentDescription: string,
+  incidentDate: Timestamp
+) {
+  const incidentsRef = collection(
+    db,
+    "mentors",
+    mentorId,
+    "tutors",
+    tutorId,
+    "incidents"
+  );
+
+  await addDoc(incidentsRef, {
+    description: incidentDescription,
+    date: serverTimestamp(),
+  });
 }

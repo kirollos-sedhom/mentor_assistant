@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
-import AddTutorForm from "./AddTutorForm";
 import AddTutorModal from "./AddTutorModal";
+import TutorItem from "./TutorItem";
 
 type Tutor = {
   tutorId: string;
@@ -40,11 +40,12 @@ export default function Dashboard() {
       <h1>wellcome {user?.displayName}</h1>
       <h2>your tutors:</h2>
       <ul>
-        {tutors.map((tutor) => (
-          <li key={tutor.tutorId}>
-            {"[ T-"}
-            {tutor.tutorId} {"]"} {tutor.tutorName}
-          </li>
+        {tutors.map((tutor, index) => (
+          <TutorItem
+            key={index}
+            tutorId={tutor.tutorId}
+            tutorName={tutor.tutorName}
+          />
         ))}
       </ul>
       {tutors.length === 0 && <p>you have no tutors yet</p>}
