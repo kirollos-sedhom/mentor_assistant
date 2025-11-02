@@ -50,7 +50,7 @@ export async function addIncident(
   mentorId: string,
   tutorId: string,
   incidentDescription: string,
-  incidentDate: Timestamp
+  incidentDate = serverTimestamp()
 ) {
   const incidentsRef = collection(
     db,
