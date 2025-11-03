@@ -50,7 +50,7 @@ export async function addIncident(
   mentorId: string,
   tutorId: string,
   incidentDescription: string,
-  incidentDate = serverTimestamp()
+  incidentDate: Date
 ) {
   const incidentsRef = collection(
     db,
@@ -63,6 +63,6 @@ export async function addIncident(
 
   await addDoc(incidentsRef, {
     description: incidentDescription,
-    date: serverTimestamp(),
+    date: incidentDate,
   });
 }

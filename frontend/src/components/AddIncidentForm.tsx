@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { addIncident } from "../services/tutorService";
-import { Timestamp } from "firebase/firestore";
 
 type Props = {
   tutorId: string;
@@ -13,9 +12,8 @@ export default function AddIncidentForm({ tutorId, onSuccess }: Props) {
   const { user } = useAuth();
 
   const [incidentDescription, setIncidentDescription] = useState<string>("");
-  const [incidentTime, setIncidentTime] = useState<Timestamp | undefined>(
-    undefined
-  );
+  const [incidentDate, setIncidentDate] = useState("");
+  const [incidentTime, setIncidentTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,11 +25,13 @@ export default function AddIncidentForm({ tutorId, onSuccess }: Props) {
     setError(null);
     setLoading(true);
     try {
+      const combinedDateTime = new Date(`${incidentDate}T${incidentTime}`);
+
       await addIncident(
         user.uid,
         tutorId.trim(),
         incidentDescription,
-        incidentTime
+        combinedDateTime
       );
 
       setIncidentDescription("");
@@ -44,14 +44,30 @@ export default function AddIncidentForm({ tutorId, onSuccess }: Props) {
   }
   return (
     <form onSubmit={handleAddIncident} className="flex flex-col gap-2 w-80">
-      <input
+      <textarea
         className="border p-2 rounded"
-        type="text"
         placeholder="incident"
+        rows={4}
         value={incidentDescription}
         required
         onChange={(e) => setIncidentDescription(e.target.value)}
       />
+      <div className="flex gap-2">
+        <input
+          type="date"
+          className="border p-2 rounded w-1/2"
+          value={incidentDate}
+          onChange={(e) => setIncidentDate(e.target.value)}
+          required
+        />
+        <input
+          type="time"
+          className="border p-2 rounded w-1/2"
+          value={incidentTime}
+          onChange={(e) => setIncidentTime(e.target.value)}
+          required
+        />
+      </div>
 
       <button
         type="submit"

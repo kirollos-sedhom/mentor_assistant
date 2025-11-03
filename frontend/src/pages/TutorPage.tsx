@@ -42,7 +42,10 @@ export default function TutorPage() {
       <h2>incidents:</h2>
       <ul>
         {incidents.map((incident, index) => (
-          <li key={index}>{incident.description}</li>
+          <li key={index}>
+            <p>{incident.description}</p>{" "}
+            <p>{incident.date?.toDate().toLocaleDateString()}</p>
+          </li>
         ))}
       </ul>
       <button
