@@ -17,6 +17,39 @@ export default function TutorPage() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [showIncidentsModal, setShowIncidentsModal] = useState(false);
 
+  // GenAI
+  async function getSummary(tutorId: string) {
+    if (!user) return;
+
+    try {
+      // 1. Get the user's ID token from Firebase Auth
+      const token = await user.getIdToken();
+
+      // 2. Call your backend endpoint
+      const response = await fetch(
+        `http://localhost:3000/summary/${user.uid}/${tutorId}`,
+        {
+          method: "GET",
+          headers: {
+            // 3. Pass the token in the Authorization header
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch summary");
+      }
+
+      const data = await response.json();
+      console.log("AI Summary:", data.summary);
+      // Now you can set this summary to your React state!
+    } catch (error) {
+      console.error("Error getting summary:", error);
+    }
+  }
+  //
+
   useEffect(() => {
     if (!user || !tutorId) return;
     const incidentsRef = collection(
@@ -54,6 +87,15 @@ export default function TutorPage() {
       >
         add Incident
       </button>
+      {tutorId && (
+        <button
+          onClick={() => getSummary(tutorId)}
+          className="mt-4 bg-red-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-red-700"
+        >
+          get summary
+        </button>
+      )}
+
       {showIncidentsModal && tutorId && (
         <AddIncidentModal
           tutorId={tutorId}
