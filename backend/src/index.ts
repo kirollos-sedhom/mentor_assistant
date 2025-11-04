@@ -76,7 +76,7 @@ Provide:
 
 Incidents:
 ${incidentTexts.join("\n")}
-    `;
+`;
 
     //
     const result = await ai.models.generateContent({
@@ -85,7 +85,14 @@ ${incidentTexts.join("\n")}
     });
     //
     // const summary = result.candidates[0].content?.parts[0].text;
-    res.json({ result });
+    console.log("finding summary:...");
+    if (result.candidates) {
+      // console.log(result.candidates[0].content?.parts);
+      if (result.candidates[0].content?.parts) {
+        console.log(result.candidates[0].content?.parts[0].text);
+        res.json({ summary: result.candidates[0].content?.parts[0].text });
+      }
+    }
   } catch (error) {
     res.json({ message: "something wrong happened" });
   }
