@@ -16,12 +16,15 @@ export default function TutorPage() {
   const { tutorId } = useParams();
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [showIncidentsModal, setShowIncidentsModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [summary, setSummary] = useState("");
 
   // GenAI
   async function getSummary(tutorId: string) {
     if (!user) return;
 
     try {
+      setLoading(true);
       // 1. Get the user's ID token from Firebase Auth
       const token = await user.getIdToken();
 
@@ -30,10 +33,6 @@ export default function TutorPage() {
         `http://localhost:3000/summary/${user.uid}/${tutorId}`,
         {
           method: "GET",
-          headers: {
-            // 3. Pass the token in the Authorization header
-            Authorization: `Bearer ${token}`,
-          },
         }
       );
 
@@ -42,10 +41,14 @@ export default function TutorPage() {
       }
 
       const data = await response.json();
+
       console.log("AI Summary:", data.summary);
+      setSummary(data.summary);
       // Now you can set this summary to your React state!
     } catch (error) {
       console.error("Error getting summary:", error);
+    } finally {
+      setLoading(false);
     }
   }
   //
@@ -95,6 +98,9 @@ export default function TutorPage() {
           get summary
         </button>
       )}
+
+      {loading && <p>loading...</p>}
+      {!loading && <p>{summary}</p>}
 
       {showIncidentsModal && tutorId && (
         <AddIncidentModal
