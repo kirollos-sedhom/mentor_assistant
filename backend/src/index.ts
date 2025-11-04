@@ -30,10 +30,6 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// auth middleware
-
-//
-
 const ai = new GoogleGenAI({ apiKey: process.env.GEMENI_API_KEY });
 app.get("/test-ai", async (req, res) => {
   const response = await ai.models.generateContent({
@@ -78,21 +74,14 @@ Incidents:
 ${incidentTexts.join("\n")}
 `;
 
-    //
     const result = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
     });
-    //
-    // const summary = result.candidates[0].content?.parts[0].text;
+
     console.log("finding summary:...");
-    if (result.candidates) {
-      // console.log(result.candidates[0].content?.parts);
-      if (result.candidates[0].content?.parts) {
-        console.log(result.candidates[0].content?.parts[0].text);
-        res.json({ summary: result.candidates[0].content?.parts[0].text });
-      }
-    }
+    console.log(result.text);
+    res.json({ summary: result.text });
   } catch (error) {
     res.json({ message: "something wrong happened" });
   }

@@ -25,10 +25,7 @@ export default function TutorPage() {
 
     try {
       setLoading(true);
-      // 1. Get the user's ID token from Firebase Auth
-      const token = await user.getIdToken();
 
-      // 2. Call your backend endpoint
       const response = await fetch(
         `http://localhost:3000/summary/${user.uid}/${tutorId}`,
         {
