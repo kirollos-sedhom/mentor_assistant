@@ -44,6 +44,53 @@ app.get("/test-ai", async (req, res) => {
   res.json({ message: response.text });
 });
 
+app.get("/summary/:mentorId/:tutorId", async (req, res) => {
+  try {
+    const { mentorId, tutorId } = req.params;
+
+    const incidentsRef = db
+      .collection("mentors")
+      .doc(mentorId)
+      .collection("tutors")
+      .doc(tutorId)
+      .collection("incidents");
+
+    const snapshot = await incidentsRef.get();
+    if (snapshot.empty) {
+      return res.json({ summary: "No incidents to summarize yet." });
+    }
+
+    const incidentTexts = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      const date = data.date?.toDate().toISOString() ?? "unknown date";
+      return `${date}: ${data.description}`;
+    });
+
+    const prompt = `
+You are an educational performance assistant.
+Summarize these incidents about a tutor's behavior or performance.
+Provide:
+- A short summary (2–3 sentences)
+- Key behavioral patterns
+- Suggestions for improvement (if any)
+
+Incidents:
+${incidentTexts.join("\n")}
+    `;
+
+    //
+    const result = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    //
+    // const summary = result.candidates[0].content?.parts[0].text;
+    res.json({ result });
+  } catch (error) {
+    res.json({ message: "something wrong happened" });
+  }
+});
+
 app.post("/test", (req, res) => {
   console.log("received:", req.body);
   res.json({ message: "data received successfully" });
