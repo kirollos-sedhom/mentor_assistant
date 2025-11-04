@@ -29,7 +29,12 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
-const ai = new GoogleGenAI({});
+
+// auth middleware
+
+//
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMENI_API_KEY });
 app.get("/test-ai", async (req, res) => {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
