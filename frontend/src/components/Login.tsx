@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signInWithGoogle } from "../services/auth";
 import { createMentorIfNotExists } from "../services/mentorService";
+import ToggleInput from "./ToggleInput";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -24,10 +25,22 @@ export default function Login() {
     }
   }
   return (
-    <div className="flex flex-col items-center gap-4">
-      <p className="text-xl">Mentor-Assistant</p>
-      <h1>Let's get started</h1>
-      <p>signup for the family and get started immediately</p>
+    <div className="flex flex-col items-center gap-4 p-4">
+      <h1 className="font-semibold text-xl">Welcome to the Mentor assistant</h1>
+      <input
+        className="bg-gray-100 px-4 py-2 border border-gray-200"
+        type="text"
+        placeholder="Email or phone number "
+      />
+      <input
+        className="bg-gray-100 px-4 py-2 border border-gray-200"
+        type="password"
+        placeholder="Enter password"
+      />
+
+      <div className="below-inputs">
+        <ToggleInput />
+      </div>
       <p className="bg-blue-500 w-50 text-white px-4 py-2 cursor-pointer">
         continue with facebook
       </p>
