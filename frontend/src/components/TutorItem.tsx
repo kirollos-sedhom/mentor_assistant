@@ -7,6 +7,11 @@ import UpdateTutorModal from "./UpdateTutorModal";
 import { deleteTutor } from "../services/tutorService";
 import { useAuth } from "../context/AuthContext";
 import { NavLink } from "react-router-dom";
+import { GrUserManager } from "react-icons/gr";
+import { MdOutlineFace } from "react-icons/md";
+import { TbFaceId } from "react-icons/tb";
+import { cn, getDeterministicColor } from "@/lib/utils";
+
 type Props = {
   tutorName: string;
   tutorId: string;
@@ -14,6 +19,8 @@ type Props = {
 export default function TutorItem({ tutorName, tutorId }: Props) {
   const [showEditModal, setShowEditModal] = useState(false);
   const displayText = `[T-${tutorId}] ${tutorName}`;
+  const color = getDeterministicColor(tutorId);
+
   const { user } = useAuth();
   async function handleDelete() {
     if (!user) return;
@@ -34,29 +41,13 @@ export default function TutorItem({ tutorName, tutorId }: Props) {
   }
 
   return (
-    <li key={tutorId} className="flex items-center justify-between p-1 my-2">
-      <NavLink
-        to={`/tutors/${tutorId}`}
-        className={"flex-grow text-blue-700 hover:underline "}
-      >
-        {displayText}
-      </NavLink>
-      <span className="flex items-center gap-2">
-        <FaEdit
-          onClick={() => handleEdit()}
-          className="fill-blue-700 cursor-pointer"
-        />{" "}
-        <AiFillDelete
-          onClick={() => handleDelete()}
-          className="fill-red-700 cursor-pointer"
-        />{" "}
-      </span>
-      {showEditModal && (
-        <UpdateTutorModal
-          tutorId={tutorId}
-          onClose={() => setShowEditModal(false)}
-        />
-      )}
+    <li key={tutorId} className="flex flex-col items-center">
+      <p className="border h-24 w-24 flex items-center justify-center rounded-sm overflow-hidden">
+        {/* employee icon here, different color depending on the index */}
+        {/* example: first employee icon yellow, second is blue, third is green , etc */}
+        <TbFaceId size={100} className={cn("bg-red-400 text-white", color)} />
+      </p>
+      <p>{displayText}</p>
     </li>
   );
 }

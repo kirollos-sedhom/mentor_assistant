@@ -52,7 +52,7 @@ export default function Dashboard() {
       Dashboard
       <h1>wellcome {user?.displayName}</h1>
       <h2>your tutors:</h2>
-      <ul>
+      <ul className="border grid grid-cols-2 lg:grid-cols-4">
         {tutors.map((tutor, index) => (
           <TutorItem
             key={index}
@@ -60,14 +60,16 @@ export default function Dashboard() {
             tutorName={tutor.tutorName}
           />
         ))}
+        <li
+          onClick={() => setIsModalOpen(true)}
+          className="flex flex-col items-center"
+        >
+          <p className="border h-24 w-24 flex items-center justify-center rounded-sm overflow-hidden bg-gray-400">
+            +
+          </p>
+        </li>
       </ul>
       {tutors.length === 0 && <p>you have no tutors yet</p>}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700"
-      >
-        add tutor
-      </button>
       {/* conditionally render the modal */}
       {isModalOpen && <AddTutorModal onClose={() => setIsModalOpen(false)} />}
       <button onClick={handleSignout} className="bg-red-300 p-2 cursor-pointer">
