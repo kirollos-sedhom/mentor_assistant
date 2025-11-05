@@ -6,6 +6,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import AddTutorModal from "./AddTutorModal";
 import TutorItem from "./TutorItem";
+import { getAuth, signOut } from "firebase/auth";
 
 type Tutor = {
   tutorId: string;
@@ -16,6 +17,18 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  function handleSignout() {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+      })
+      .catch((error) => {
+        // An error happened.
+        console.log("looks like youre trapped :c");
+      });
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -57,6 +70,9 @@ export default function Dashboard() {
       </button>
       {/* conditionally render the modal */}
       {isModalOpen && <AddTutorModal onClose={() => setIsModalOpen(false)} />}
+      <button onClick={handleSignout} className="bg-red-300 p-2 cursor-pointer">
+        log out ?
+      </button>
     </div>
   );
 }

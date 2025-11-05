@@ -1,6 +1,10 @@
 // backend/src/index.ts
 
-import express from "express";
+import express, {
+  Request as ExpressRequest,
+  Response,
+  NextFunction,
+} from "express";
 import cors from "cors";
 import admin from "firebase-admin";
 import path from "path";
@@ -29,6 +33,33 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+// auth
+
+interface AuthRequest extends ExpressRequest {
+  user?: admin.auth.DecodedIdToken;
+}
+const verifyToken = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  // This will now work perfectly
+  const authHeader = req.header("Authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).send({ error: "Unauthorized: No token provided." });
+  }
+  const idToken = authHeader.split("Bearer ")[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    req.user = decodedToken;
+    next();
+  } catch (error) {
+    console.error("Error verifying token:", error);
+    return res.status(403).send({ error: "Forbidden: Invalid token." });
+  }
+};
+//
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMENI_API_KEY });
 app.get("/test-ai", async (req, res) => {
@@ -40,29 +71,38 @@ app.get("/test-ai", async (req, res) => {
   res.json({ message: response.text });
 });
 
-app.get("/summary/:mentorId/:tutorId", async (req, res) => {
-  try {
-    const { mentorId, tutorId } = req.params;
+app.get(
+  "/summary/:mentorId/:tutorId",
+  verifyToken,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { mentorId, tutorId } = req.params;
 
-    const incidentsRef = db
-      .collection("mentors")
-      .doc(mentorId)
-      .collection("tutors")
-      .doc(tutorId)
-      .collection("incidents");
+      if (req.user?.uid !== mentorId) {
+        return res
+          .status(403)
+          .json({ error: "Forbidden: You can only access your own data." });
+      }
 
-    const snapshot = await incidentsRef.get();
-    if (snapshot.empty) {
-      return res.json({ summary: "No incidents to summarize yet." });
-    }
+      const incidentsRef = db
+        .collection("mentors")
+        .doc(mentorId)
+        .collection("tutors")
+        .doc(tutorId)
+        .collection("incidents");
 
-    const incidentTexts = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      const date = data.date?.toDate().toISOString() ?? "unknown date";
-      return `${date}: ${data.description}`;
-    });
+      const snapshot = await incidentsRef.get();
+      if (snapshot.empty) {
+        return res.json({ summary: "No incidents to summarize yet." });
+      }
 
-    const prompt = `
+      const incidentTexts = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        const date = data.date?.toDate().toISOString() ?? "unknown date";
+        return `${date}: ${data.description}`;
+      });
+
+      const prompt = `
 You are an educational performance assistant.
 Summarize these incidents about a tutor's behavior or performance.
 Provide:
@@ -74,18 +114,19 @@ Incidents:
 ${incidentTexts.join("\n")}
 `;
 
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+      const result = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+      });
 
-    console.log("finding summary:...");
-    console.log(result.text);
-    res.json({ summary: result.text });
-  } catch (error) {
-    res.json({ message: "something wrong happened" });
+      console.log("finding summary:...");
+      console.log(result.text);
+      res.json({ summary: result.text });
+    } catch (error) {
+      res.json({ message: "something wrong happened" });
+    }
   }
-});
+);
 
 app.post("/test", (req, res) => {
   console.log("received:", req.body);

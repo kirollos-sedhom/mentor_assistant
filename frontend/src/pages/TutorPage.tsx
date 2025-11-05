@@ -26,10 +26,18 @@ export default function TutorPage() {
     try {
       setLoading(true);
 
+      setSummary("");
+
+      // 1. ADD BACK THE TOKEN LOGIC
+      const token = await user.getIdToken();
+
       const response = await fetch(
         `http://localhost:3000/summary/${user.uid}/${tutorId}`,
         {
           method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
