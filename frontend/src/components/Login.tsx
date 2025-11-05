@@ -32,7 +32,18 @@ export default function Login() {
   }
   return (
     <div className="h-screen flex justify-center">
-      <div className="form m-4 flex flex-col items-center gap-4  w-8/10">
+      <img
+        src="/login-big.png"
+        alt="an image of a mentor guiding his subordinate"
+        className="hidden w-2/3 lg:block object-cover"
+      />
+      <div className="form m-4 flex flex-col items-center gap-4  w-8/10 lg:w-1/3 lg:p-8 lg:text-center">
+        <img
+          src="/logo.png"
+          alt="logo of mentor assistant represented by letters M and A"
+          width={180}
+          className="mt-8"
+        />
         <h1 className="font-semibold text-xl my-5">
           Welcome to the Mentor assistant
         </h1>
@@ -59,8 +70,14 @@ export default function Login() {
 
         <Button onClick={handleLogin} className="w-full mt-4">
           <FcGoogle />
-          {loading ? "signing in..." : "continue with google"}
+          {loading ? "signing in..." : "or continue with google"}
         </Button>
+        <p className="text-sm">
+          Don't have an account?{" "}
+          <NavLink className={"text-blue-500"} to={"/signup"}>
+            Sign up now
+          </NavLink>
+        </p>
       </div>
     </div>
   );
