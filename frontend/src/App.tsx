@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./components/Dashboard";
 import { useAuth } from "./context/AuthContext";
 import TutorPage from "./pages/TutorPage";
+import Home from "./pages/Home";
 
 function App() {
   const { user, loading } = useAuth();
@@ -23,7 +24,7 @@ function App() {
         path="/"
         element={
           <ProtectedRoute user={user}>
-            <Dashboard />
+            <Home />
           </ProtectedRoute>
         }
       />

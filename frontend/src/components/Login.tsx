@@ -7,12 +7,18 @@ import { createMentorIfNotExists } from "../services/mentorService";
 import MySwitch from "./SHADCN/MySwitch";
 
 import { Button } from "@/components/ui/button";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
   let navigate = useNavigate();
   async function handleLogin() {
     setLoading(true);
