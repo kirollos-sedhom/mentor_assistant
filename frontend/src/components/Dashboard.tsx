@@ -7,6 +7,7 @@ import { db } from "../firebase";
 import AddTutorModal from "./AddTutorModal";
 import TutorItem from "./TutorItem";
 import { getAuth, signOut } from "firebase/auth";
+import { FaPlus } from "react-icons/fa";
 
 type Tutor = {
   tutorId: string;
@@ -17,18 +18,6 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [tutors, setTutors] = useState<Tutor[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  function handleSignout() {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-        console.log("looks like youre trapped :c");
-      });
-  }
 
   useEffect(() => {
     if (!user) return;
@@ -48,11 +37,16 @@ export default function Dashboard() {
   if (!user) return <div>please log in first</div>;
 
   return (
-    <div>
-      Dashboard
-      <h1>wellcome {user?.displayName}</h1>
-      <h2>your tutors:</h2>
-      <ul className="border grid grid-cols-2 lg:grid-cols-4">
+    <div className="dashboard text-center">
+      <h1 className="text-xl font-semibold mt-4">
+        Wellcome {user?.displayName}
+      </h1>
+      {tutors.length > 0 ? (
+        <h2 className="my-4 text-lg">choose a tutor</h2>
+      ) : (
+        <h2>you don't have a tutor yet</h2>
+      )}
+      <ul className="grid grid-cols-2 lg:grid-cols-4 gap-8">
         {tutors.map((tutor, index) => (
           <TutorItem
             key={index}
@@ -65,16 +59,13 @@ export default function Dashboard() {
           className="flex flex-col items-center"
         >
           <p className="border h-24 w-24 flex items-center justify-center rounded-sm overflow-hidden bg-gray-400">
-            +
+            <FaPlus size={28} />
           </p>
         </li>
       </ul>
-      {tutors.length === 0 && <p>you have no tutors yet</p>}
+
       {/* conditionally render the modal */}
       {isModalOpen && <AddTutorModal onClose={() => setIsModalOpen(false)} />}
-      <button onClick={handleSignout} className="bg-red-300 p-2 cursor-pointer">
-        log out ?
-      </button>
     </div>
   );
 }
