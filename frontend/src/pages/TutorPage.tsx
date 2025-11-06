@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import AddIncidentModal from "../components/AddIncidentModal";
+import Incident from "@/components/Incident";
 
 type Incident = {
   description?: string;
@@ -18,7 +19,7 @@ export default function TutorPage() {
   const [showIncidentsModal, setShowIncidentsModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState("");
-
+  // const displayText = `[T-${tutorId}] ${tutorName}`; //todo: must get the tutor name from database first
   // GenAI
   async function getSummary(tutorId: string) {
     if (!user) return;
@@ -78,15 +79,18 @@ export default function TutorPage() {
     return () => unsubscribe();
   }, [user, tutorId]);
   return (
-    <div>
-      <h1>TutorPage for tutor {tutorId}</h1>
-      <h2>incidents:</h2>
+    <div className="bg-[#DDDFE7] h-screen">
+      <h1 className="text-center text-xl font-thin py-8">
+        Incidents for tutor {tutorId}
+      </h1>
+
       <ul>
         {incidents.map((incident, index) => (
-          <li key={index}>
-            <p>{incident.description}</p>{" "}
-            <p>{incident.date?.toDate().toLocaleDateString()}</p>
-          </li>
+          <Incident
+            key={index}
+            description={incident.description}
+            date={incident.date}
+          />
         ))}
       </ul>
       <button
