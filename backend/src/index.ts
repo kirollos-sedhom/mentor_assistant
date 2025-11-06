@@ -10,6 +10,7 @@ import admin from "firebase-admin";
 import path from "path";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import { SchemaType } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -93,7 +94,12 @@ app.get(
 
       const snapshot = await incidentsRef.get();
       if (snapshot.empty) {
-        return res.json({ summary: "No incidents to summarize yet." });
+        // Send back the full, empty JSON structure
+        return res.json({
+          summary: "No incidents to summarize yet.",
+          patterns: [],
+          suggestions: [],
+        });
       }
 
       const incidentTexts = snapshot.docs.map((doc) => {
@@ -102,32 +108,80 @@ app.get(
         return `${date}: ${data.description}`;
       });
 
-      const prompt = `
-You are an educational performance assistant.
-Summarize these incidents about a tutor's behavior or performance.
-Provide:
-- A short summary (2–3 sentences)
-- Key behavioral patterns
-- Suggestions for improvement (if any)
+      // 1. Define the Schema using SchemaType
+      const jsonSchema = {
+        type: SchemaType.OBJECT,
+        properties: {
+          summary: { type: SchemaType.STRING },
+          patterns: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
+          suggestions: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING },
+          },
+        },
+        required: ["summary", "patterns", "suggestions"],
+      };
 
-Incidents:
+      // 2. Define the strict prompt
+      const prompt = `
+You are an educational performance assistant. Your task is to analyze a list of incidents for a tutor and provide a holistic performance summary.
+Analyze ALL incidents AS A WHOLE. You MUST NOT summarize each incident individually.
+Respond ONLY with a JSON object matching this schema:
+{
+  "summary": "A 2-3 sentence overall summary of performance.",
+  "patterns": ["A list of key behavioral patterns (strengths or weaknesses)."],
+  "suggestions": ["A list of actionable suggestions for improvement (if any)."]
+}
+Here are the incidents:
 ${incidentTexts.join("\n")}
 `;
 
+      // 3. Create the request object (no 'GenerateContentRequest' type)
+      const genAIRequest = {
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: jsonSchema,
+        },
+      };
+
+      // 4. Call the AI
       const result = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
+        model: "gemini-2.5-flash", // Use a stable model
+        ...genAIRequest,
       });
 
       console.log("finding summary:...");
-      console.log(result.text);
-      res.json({ summary: result.text });
+
+      // 5. Safely get and parse the text
+      const jsonString = result.text;
+      if (!jsonString) {
+        throw new Error("No text response from AI.");
+      }
+
+      const startIndex = jsonString.indexOf("{");
+      const endIndex = jsonString.lastIndexOf("}");
+
+      if (startIndex === -1 || endIndex === -1) {
+        throw new Error("AI response did not contain valid JSON.");
+      }
+
+      // Extract the clean JSON string
+      const extractedJson = jsonString.substring(startIndex, endIndex + 1);
+
+      // Now, parse the *clean* string
+      const summaryJson = JSON.parse(extractedJson);
+      console.log(summaryJson);
+      res.json(summaryJson); // Send the full object to the frontend
     } catch (error) {
-      res.json({ message: "something wrong happened" });
+      console.error("Error in /summary route:", error);
+      res.status(500).json({ message: "Something wrong happened" });
     }
   }
 );
-
 app.post("/test", (req, res) => {
   console.log("received:", req.body);
   res.json({ message: "data received successfully" });
