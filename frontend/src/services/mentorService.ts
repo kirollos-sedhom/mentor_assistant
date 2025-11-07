@@ -5,8 +5,6 @@ import { db } from "../firebase";
 
 import { type User } from "firebase/auth";
 
-import { getDatabase, ref, onValue, get, child } from "firebase/database";
-import { getAuth } from "firebase/auth";
 
 export async function createMentorIfNotExists(user: User) {
   // typescript complaining because of no type

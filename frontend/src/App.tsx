@@ -1,13 +1,11 @@
 // src/App.tsx
 
-import { onAuthStateChanged, type User } from "firebase/auth";
 import "./App.css";
 import Login from "./components/Login";
-import { useEffect, useState } from "react";
-import { auth } from "./firebase";
+
 import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from "./components/Dashboard";
+
 import { useAuth } from "./context/AuthContext";
 import TutorPage from "./pages/TutorPage";
 import Home from "./pages/Home";

@@ -15,11 +15,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (user) {
     return <Navigate to="/" replace />;
   }
-  let navigate = useNavigate();
   async function handleLogin() {
     setLoading(true);
     setError(null);
@@ -84,6 +84,7 @@ export default function Login() {
             Sign up now
           </NavLink>
         </p>
+        {error && <p className="bg-red-400">error occured</p>}
       </div>
     </div>
   );

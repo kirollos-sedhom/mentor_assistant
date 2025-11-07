@@ -44,7 +44,7 @@ export default function TutorItem({ tutorName, tutorId, isManageMode }: Props) {
       await deleteTutor(user.uid, tutorId);
       // The onSnapshot listener in Dashboard.tsx will
       // automatically remove this item from the UI.
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting tutor:", error);
       alert("Failed to delete tutor, try again.");
     }

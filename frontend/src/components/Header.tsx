@@ -1,5 +1,5 @@
 import { getAuth, signOut } from "firebase/auth";
-import React from "react";
+
 import { CiLogout } from "react-icons/ci";
 
 export default function Header() {
@@ -11,7 +11,7 @@ export default function Header() {
       })
       .catch((error) => {
         // An error happened.
-        console.log("looks like youre trapped :c");
+        console.log("looks like youre trapped :c",error);
       });
   }
   return (

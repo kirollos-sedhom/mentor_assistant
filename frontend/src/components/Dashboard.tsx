@@ -6,8 +6,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import AddTutorModal from "./AddTutorModal";
 import TutorItem from "./TutorItem";
-import { getAuth, signOut } from "firebase/auth";
-import { FaPlus, FaPen } from "react-icons/fa"; // <-- Add FaPen for "manage"
+import { FaPlus} from "react-icons/fa"; 
 type Tutor = {
   tutorId: string;
   tutorName: string;

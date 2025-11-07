@@ -34,7 +34,8 @@ export default function AddIncidentChat({ tutorId }: Props) {
       setDescription("");
       setIncidentDate("");
       setIncidentTime("");
-    } catch (error: any) {
+    } catch (error) {
+      if(error instanceof Error)
       setError(error.message);
     } finally {
       setLoading(false);
